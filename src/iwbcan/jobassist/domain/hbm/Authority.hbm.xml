@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="iwbcan.jobassist.domain">
+    <class name="Authority" table="authority">
+        <id name="id" column="id">
+            <generator class="native" />
+        </id>
+
+        <property name="name" column="name" type="string" not-null="true" />
+
+        <set name="users" table="user_authority" inverse="true">
+            <key column="authority_id"/>
+            <many-to-many column="user_id" class="iwbcan.jobassist.domain.UserRepository" />
+        </set>
+
+        <set name="groups" table="groups_authority" inverse="true">
+            <key column="authority_id" />
+            <many-to-many column="groups_id" class="Groups" />
+        </set>
+    </class>
+</hibernate-mapping>

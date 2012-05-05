@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="jobassist">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib" />
+      <root url="file://$PROJECT_DIR$/lib/hibernate" />
+      <root url="file://$PROJECT_DIR$/lib/spring" />
+      <root url="file://$PROJECT_DIR$/lib/spring-security" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/hibernate" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/spring" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/spring-security" recursive="false" />
+  </library>
+</component>

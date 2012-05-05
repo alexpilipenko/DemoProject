@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="iwbcan.jobassist.domain">
+    <class name="UserRepository" table="user">
+        <id name="id" column="id">
+            <generator class="native" />
+        </id>
+
+        <property name="username" column="username" type="string" length="50" not-null="true" />
+        <property name="password" column="password" type="string" length="50" not-null="true" />
+        <property name="enabled" column="enabled" type="boolean" not-null="true" />
+
+        <set name="authorities" table="user_authority">
+            <key column="user_id" />
+            <many-to-many column="authority_id" class="Authority" />
+        </set>
+
+        <set name="groups" table="groups_user">
+            <key column="user_id" />
+            <many-to-many column="groups_id" class="Groups" />
+        </set>
+
+    </class>
+</hibernate-mapping>

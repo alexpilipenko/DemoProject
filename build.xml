@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<project name="jobassist" default="usage" basedir=".">
+
+    <property file="build.properties" />
+
+    <property name="name" value="jobassist" />
+    <property name="src.dir" value="src" />
+    <property name="web.dir" value="war" />
+    <property name="lib.dir" value="lib" />
+    <property name="configs.dir" value="configs" />
+    <property name="hbm.dir" value="iwbcan/jobassist/domain/hbm" />
+    <property name="build.dir" value="${web.dir}/WEB-INF/classes" />
+
+    <path id="master-classpath">
+        <fileset dir="${lib.dir}" includes="*.jar" />
+        <fileset dir="${lib.dir}/hibernate" includes="*.jar" />
+        <fileset dir="${lib.dir}/spring" includes="*.jar" />
+        <fileset dir="${lib.dir}/spring-security" includes="*.jar" />
+        <fileset dir="${appserver.lib}">
+            <include name="servlet*.jar" />
+        </fileset>
+        <pathelement path="${build.dir}" />
+    </path>
+
+
+    <target name="usage">
+        <echo message=""/>
+        <echo message="${name} build file"/>
+        <echo message="-----------------------------------"/>
+        <echo message=""/>
+        <echo message="Available targets are:"/>
+        <echo message=""/>
+        <echo message="build     --> Build the application"/>
+        <echo message="deploy    --> Deploy application as directory"/>
+        <echo message="deploywar --> Deploy application as a WAR file"/>
+        <!--<echo message="install   &ndash;&gt; Install application in Tomcat"/>
+        <echo message="reload    &ndash;&gt; Reload application in Tomcat"/>
+        <echo message="start     &ndash;&gt; Start Tomcat application"/>
+        <echo message="stop      &ndash;&gt; Stop Tomcat application"/>
+        <echo message="list      &ndash;&gt; List Tomcat applications"/>-->
+        <echo message=""/>
+    </target>
+
+    <target name="build" description="Compile main source tree java files">
+        <mkdir dir="${build.dir}"/>
+        <javac destdir="${build.dir}" source="1.5" target="1.5" debug="true"
+               deprecation="false" optimize="false" failonerror="true">
+            <src path="${src.dir}"/>
+            <classpath refid="master-classpath"/>
+        </javac>
+
+        <copy todir="${build.dir}/${hbm.dir}" preservelastmodified="true">
+            <fileset dir="${src.dir}/${hbm.dir}" includes="*.hbm.xml"/>
+        </copy>
+
+        <mkdir dir="${web.dir}/WEB-INF/lib" />
+        <copy todir="${web.dir}/WEB-INF/lib" preservelastmodified="true">
+            <fileset dir="${lib.dir}" includes="*.jar" />
+            <fileset dir="${lib.dir}/hibernate" includes="*.jar" />
+            <fileset dir="${lib.dir}/spring" includes="*.jar" />
+            <fileset dir="${lib.dir}/spring-security" includes="*.jar" />
+        </copy>
+
+        <copy todir="${build.dir}" preservelastmodified="true">
+            <fileset dir="${configs.dir}">
+                <include name="*.properties" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="deploy" depends="build" description="Deploy application">
+        <antcall target="tomcat_stop" />
+        <copy todir="${deploy.path}" preservelastmodified="true">
+            <fileset dir="${web.dir}">
+                <include name="**/*.*"/>
+            </fileset>
+        </copy>
+        <antcall target="tomcat_start" />
+    </target>
+
+    <target name="clear">
+        <antcall target="tomcat_stop" />
+        <delete>
+            <fileset dir="${web.dir}/WEB-INF/lib">
+                <include name="*.jar" />
+            </fileset>
+        </delete>
+        <delete dir="${web.dir}/WEB-INF/classes" />
+        <delete dir="${deploy.path}" />
+        <antcall target="tomcat_start" />
+    </target>
+
+    <!-- ################################################ -->
+
+    <target name="tomcat_stop">
+        <exec executable="net">
+            <arg line='stop "${tomcat.service.name}"' />
+        </exec>
+    </target>
+
+    <target name="tomcat_start">
+        <exec executable="net">
+            <arg line='start "${tomcat.service.name}"' />
+        </exec>
+    </target>
+
+    <target name="tomcat_restart">
+        <antcall target="tomcat_stop" />
+        <antcall target="tomcat_start" />
+    </target>
+
+    <path id="catalina-ant-classpath">
+        <fileset dir="${appserver.lib}">
+            <include name="catalina-ant.jar" />
+        </fileset>
+    </path>
+
+    <taskdef name="list" classname="org.apache.catalina.ant.ListTask">
+        <classpath refid="catalina-ant-classpath" />
+    </taskdef>
+
+    <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask">
+        <classpath refid="catalina-ant-classpath" />
+    </taskdef>
+
+    <taskdef name="start" classname="org.apache.catalina.ant.StartTask">
+        <classpath refid="catalina-ant-classpath" />
+    </taskdef>
+
+    <taskdef name="stop" classname="org.apache.catalina.ant.StopTask">
+        <classpath refid="catalina-ant-classpath" />
+    </taskdef>
+
+    <target name="list" description="List of application for domain">
+        <list url="${tomcat.manager.url}"
+              username="${tomcat.manager.username}"
+              password="${tomcat.manager.password}" />
+    </target>
+
+    <target name="reload" description="Reload application in Tomcat">
+        <reload url="${tomcat.manager.url}"
+                username="${tomcat.manager.username}"
+                password="${tomcat.manager.password}"
+                path="/" />
+    </target>
+
+    <target name="stop" description="">
+        <stop url="${tomcat.manager.url}"
+              username="${tomcat.manager.username}"
+              password="${tomcat.manager.password}"
+              path="/" />
+    </target>
+
+    <target name="start" description="">
+        <start url="${tomcat.manager.url}"
+               username="${tomcat.manager.username}"
+               password="${tomcat.manager.password}"
+               path="/" />
+    </target>
+
+</project>
